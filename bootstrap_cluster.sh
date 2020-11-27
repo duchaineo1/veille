@@ -515,7 +515,7 @@ done
 echo '[STEP 8 - etcd service]'
 
 
-for instance in worker-0 worker-1 worker2; do 
+for instance in controller-0 controller-1 controller-2; do 
 	INTERNAL_IP=$(lxc info ${instance} | grep eth0 | awk '{print $3}' | head -n 1)
 	ETCD_NAME=$(lxc info worker-0 | grep Name: | awk '{print $2}')
 	lxc exec ${instance} wget -q --show-progress --https-only --timestamping \
