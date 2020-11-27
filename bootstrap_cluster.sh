@@ -20,11 +20,11 @@ for instance in worker-0 worker-1 worker-2
 do
 	lxc launch ubuntu:18.04 ${instance} --profile k8s
 	sleep 10
-	lxc stop ${instance}
-	sleep 10
-	lxc network attach mynet ${instance} eth0
-	lxc start ${instance}
-	sleep 5 
+	#lxc stop ${instance}
+	#sleep 10
+	#lxc network attach mynet ${instance} eth0
+	#lxc start ${instance}
+	#sleep 5 
 	lxc list
 	
 done;
@@ -40,11 +40,11 @@ for instance in controller-0 controller-1 controller-2
 do
         lxc launch ubuntu:18.04 ${instance} --profile k8s
         sleep 10
-        lxc stop ${instance}
-        sleep 10
-        lxc network attach mynet ${instance} eth0
-        lxc start ${instance}
-	sleep 5 
+        #lxc stop ${instance}
+        #sleep 10
+        #lxc network attach mynet ${instance} eth0
+        #lxc start ${instance}
+	#sleep 5 
 	lxc list
 done;
 
@@ -57,11 +57,11 @@ done;
 
 lxc launch images:centos/7 haproxy
 sleep 10
-lxc stop haproxy
-sleep 10
-lxc network attach mynet haproxy eth0 
-lxc start haproxy
-sleep 20
+#lxc stop haproxy
+#sleep 10
+#lxc network attach mynet haproxy eth0 
+#lxc start haproxy
+#sleep 20
 CLUSTER_IP=$(lxc list | grep haproxy | awk '{print $6}')
 echo 'Cluster IP :' ${CLUSTER_IP}
 echo 'Workers IP :' ${WORKER_IPS}
@@ -82,13 +82,16 @@ lxc exec haproxy -- systemctl enable haproxy
 lxc exec haproxy -- systemctl start haproxy
 
 
-curl -o cfssl https://storage.googleapis.com/kubernetes-the-hard-way/cfssl/1.4.1/darwin/cfssl
-curl -o cfssljson https://storage.googleapis.com/kubernetes-the-hard-way/cfssl/1.4.1/darwin/cfssljson
+wget -q --show-progress --https-only --timestamping \
+  https://storage.googleapis.com/kubernetes-the-hard-way/cfssl/1.4.1/linux/cfssl \
+  https://storage.googleapis.com/kubernetes-the-hard-way/cfssl/1.4.1/linux/cfssljson
 
 chmod +x cfssl cfssljson
-
 sudo mv cfssl cfssljson /usr/local/bin/
 
+wget https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kubectl
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
 
 
 echo '[STEP 5 - CA and TLS certificates]'
