@@ -511,3 +511,24 @@ EOF
 for instance in controller-0 controller-1 controller-2; do
   lxc file push encryption-config.yaml ${instance}/root/
 done
+
+echo '[STEP 8 - etcd service]'
+
+
+for instance in worker-0 worker-1 worker2; do 
+	INTERNAL_IP=$(lxc info ${instance} | grep eth0 | awk '{print $3}' | head -n 1)
+	ETCD_NAME=$(lxc info worker-0 | grep Name: | awk '{print $2}')
+	lxc exec ${instance} wget -q --show-progress --https-only --timestamping \
+  "https://github.com/etcd-io/etcd/releases/download/v3.4.10/etcd-v3.4.10-linux-amd64.tar.gz"
+	lxc exec ${instance} tar -xvf etcd-v3.4.10-linux-amd64.tar.gz
+	lxc exec ${instance}  mv etcd-v3.4.10-linux-amd64/etcd* /usr/local/bin/
+	lxc exec ${instance}  mkdir -p /etc/etcd /var/lib/etcd
+	lxc exec ${instance}  chmod 700 /var/lib/etcd
+	lxc exec ${instance}  cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
+	export controller0_ip controller1_ip controller2_ip INTERNAL_IP
+	envsubst < etcd.service_templace.cfg > etcd.service
+	lxc file push etcd.service ${instance}/etc/systemd/system/etcd.service
+	lxc exec ${instance} systemctl daemon-reload
+	lxc exec ${instance} systemctl enable etcd
+  	lxc exec ${instance} systemctl start etcd
+
