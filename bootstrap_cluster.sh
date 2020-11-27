@@ -531,4 +531,4 @@ for instance in controller-0 controller-1 controller-2; do
 	lxc exec ${instance} systemctl daemon-reload
 	lxc exec ${instance} systemctl enable etcd
   	lxc exec ${instance} systemctl start etcd
-
+done
