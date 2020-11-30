@@ -521,7 +521,8 @@ for instance in controller-0 controller-1 controller-2; do
 	lxc exec ${instance} -- wget -q --show-progress --https-only --timestamping \
   "https://github.com/etcd-io/etcd/releases/download/v3.4.10/etcd-v3.4.10-linux-amd64.tar.gz"
 	lxc exec ${instance} -- tar -xvf etcd-v3.4.10-linux-amd64.tar.gz
-	lxc exec ${instance} -- mv etcd-v3.4.10-linux-amd64/etcd* /usr/local/bin/
+	lxc exec ${instance} -- mv etcd-v3.4.10-linux-amd64/etcd /usr/local/bin/
+	lxc exec ${instance} -- mv etcd-v3.4.10-linux-amd64/etcdctl /usr/local/bin/
 	lxc exec ${instance} -- mkdir -p /etc/etcd /var/lib/etcd
 	lxc exec ${instance} -- chmod 700 /var/lib/etcd
 	lxc exec ${instance} -- cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
