@@ -517,7 +517,7 @@ echo '[STEP 8 - etcd service]'
 
 for instance in controller-0 controller-1 controller-2; do 
 	INTERNAL_IP=$(lxc info ${instance} | grep eth0 | awk '{print $3}' | head -n 1)
-	ETCD_NAME=$(lxc info worker-0 | grep Name: | awk '{print $2}')
+	ETCD_NAME=$(lxc info ${instance} | grep Name: | awk '{print $2}')
 	lxc exec ${instance} -- wget -q --show-progress --https-only --timestamping \
   "https://github.com/etcd-io/etcd/releases/download/v3.4.10/etcd-v3.4.10-linux-amd64.tar.gz"
 	lxc exec ${instance} -- tar -xvf etcd-v3.4.10-linux-amd64.tar.gz
