@@ -527,7 +527,7 @@ for instance in controller-0 controller-1 controller-2; do
 	lxc exec ${instance} -- chmod 700 /var/lib/etcd
 	lxc exec ${instance} -- cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
 	export controller0_ip controller1_ip controller2_ip INTERNAL_IP
-	envsubst < etcd.service_templace.cfg > etcd.service
+	envsubst < etcd.service_template.cfg > etcd.service
 	lxc file push etcd.service ${instance}/etc/systemd/system/etcd.service
 	lxc exec ${instance} -- systemctl daemon-reload
 	lxc exec ${instance} -- systemctl enable etcd
@@ -537,6 +537,7 @@ done
 echo '[STEP 8 - Bootstrapping controller nodes]'
 
 for instance in controller-0 controller-1 controller-2; do 
+	INTERNAL_IP=$(lxc info ${instance} | grep eth0 | awk '{print $3}' | head -n 1)
 	lxc exec ${instance} -- mkdir -p /etc/kubernetes/config
 	lxc exec ${instance} -- wget -q --show-progress --https-only --timestamping \
 	  "https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kube-apiserver" \
@@ -547,4 +548,7 @@ for instance in controller-0 controller-1 controller-2; do
   	lxc exec ${instance} -- mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
 	lxc exec ${instance} -- mkdir -p /var/lib/kubernetes/
 	lxc exec ${instance} -- mv ca.pem ca-key.pem kubernetes-key.pem kubernetes.pem service-account-key.pem service-account.pem encryption-config.yaml /var/lib/kubernetes/
+	export controller0_ip controller1_ip controller2_ip INTERNAL_IP
+	envsubst < kube-apiserver.service_template > kube-apiserver.service
+	lxc file push kube-apiserver.service ${instance}/etc/systemd/system/kube-apiserver.service
 done
