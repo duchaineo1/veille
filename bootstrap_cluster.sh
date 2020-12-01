@@ -619,7 +619,16 @@ for instance in worker-0 worker-1 worker-2; do
 	lxc file push kubelet.service ${instance}/etc/systemd/system/kubelet.service
 	lxc file push kube-proxy-config.yaml ${instance}/var/lib/kube-proxy/kube-proxy-config.yaml
 	lxc file push kube-proxy.service ${instance}/etc/systemd/system/kube-proxy.service
-	lxc exec ${instance} -- daemon-reload
-	lxc exec ${instance} -- enable containerd kubelet kube-proxy
-	lxc exec ${instance} -- start containerd kubelet kube-proxy
 done
+
+lxc exec worker-0 -- daemon-reload
+lxc exec worker-0 -- enable containerd kubelet kube-proxy
+lxc exec worker-0 -- start containerd kubelet kube-proxy
+
+lxc exec worker-1 -- daemon-reload
+lxc exec worker-1 -- enable containerd kubelet kube-proxy
+lxc exec worker-1 -- start containerd kubelet kube-proxy
+
+lxc exec worker-2 -- daemon-reload
+lxc exec worker-2 -- enable containerd kubelet kube-proxy
+lxc exec worker-2 -- start containerd kubelet kube-proxy
