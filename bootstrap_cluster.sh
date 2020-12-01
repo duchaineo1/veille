@@ -551,4 +551,7 @@ for instance in controller-0 controller-1 controller-2; do
 	export controller0_ip controller1_ip controller2_ip INTERNAL_IP
 	envsubst < kube-apiserver.service_template > kube-apiserver.service
 	lxc file push kube-apiserver.service ${instance}/etc/systemd/system/kube-apiserver.service
+	lxc file push kube-controller-manager.service ${instance}/etc/systemd/system/kube-controller-manager.service
+	lxc exec ${instance} -- mv kube-scheduler.kubeconfig /var/lib/kubernetes/
+	
 done
