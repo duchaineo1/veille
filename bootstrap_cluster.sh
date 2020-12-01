@@ -553,5 +553,7 @@ for instance in controller-0 controller-1 controller-2; do
 	lxc file push kube-apiserver.service ${instance}/etc/systemd/system/kube-apiserver.service
 	lxc file push kube-controller-manager.service ${instance}/etc/systemd/system/kube-controller-manager.service
 	lxc exec ${instance} -- mv kube-scheduler.kubeconfig /var/lib/kubernetes/
-	
+	lxc file push kube-scheduler.yaml ${instance}/etc/kubernetes/config/kube-scheduler.yaml
+	lxc file push /etc/systemd/system/kube-scheduler.service ${instance}/etc/systemd/system/kube-scheduler.service
+	lxc exec ${instance} -- systemctl daemon-reload && systemctl enable kube-apiserver kube-controller-manager kube-scheduler && systemctl start kube-apiserver kube-controller-manager kube-scheduler	
 done
