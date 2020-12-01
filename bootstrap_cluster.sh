@@ -534,7 +534,7 @@ for instance in controller-0 controller-1 controller-2; do
   	lxc exec ${instance} -- systemctl start etcd
 done
 
-echo '[STEP 8 - Bootstrapping controller nodes]'
+echo '[STEP 8 - Bootstrapping controller nodes  *THIS MIGHT TAKE A WHILE*]'
 
 for instance in controller-0 controller-1 controller-2; do 
 	INTERNAL_IP=$(lxc info ${instance} | grep eth0 | awk '{print $3}' | head -n 1)
@@ -564,3 +564,54 @@ lxc file push rbac-cluster-binding.yaml controller-0/root/
 lxc exec controller-0 -- kubectl apply --kubeconfig admin.kubeconfig -f rbac-cluster-role.yaml
 lxc exec controller-0 -- kubectl apply --kubeconfig admin.kubeconfig -f rbac-cluster-binding.yaml
 
+echo '[STEP 9 - Bootstrapping worker nodes]'
+
+for instance in worker-0 worker-1 worker-2; do 
+	CIDR_NUMBER=$(lxc info ${instance} | grep Name: | awk '{print $2}' | tail -c 2)
+	CIDR_IP=200.0.$CIDR_NUMBER.0/24
+	HOSTNAME=$(lxc exec ${instance} -- hostname)
+	lxc exec ${instance} -- apt-get install -y socat conntrack ipset
+	swapoff -a
+	lxc exec ${instance} -- wget -q --show-progress --https-only --timestamping \
+  https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.18.0/crictl-v1.18.0-linux-amd64.tar.gz \
+  https://github.com/opencontainers/runc/releases/download/v1.0.0-rc91/runc.amd64 \
+  https://github.com/containernetworking/plugins/releases/download/v0.8.6/cni-plugins-linux-amd64-v0.8.6.tgz \
+  https://github.com/containerd/containerd/releases/download/v1.3.6/containerd-1.3.6-linux-amd64.tar.gz \
+  https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kubectl \
+  https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kube-proxy \
+  https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kubelet
+  	lxc exec ${instance} -- sudo mkdir -p \
+	  /etc/cni/net.d \
+	  /opt/cni/bin \
+	  /var/lib/kubelet \
+	  /var/lib/kube-proxy \
+	  /var/lib/kubernetes \
+	  /var/run/kubernetes
+	lxc exec ${instance} -- mkdir containerd
+	lxc exec ${instance} -- tar -xvf crictl-v1.18.0-linux-amd64.tar.gz
+	lxc exec ${instance} -- tar -xvf containerd-1.3.6-linux-amd64.tar.gz -C containerd
+	lxc exec ${instance} -- tar -xvf cni-plugins-linux-amd64-v0.8.6.tgz -C /opt/cni/bin/
+	lxc exec ${instance} -- mkdir mv runc.amd64 runc
+	lxc exec ${instance} -- chmod +x crictl kubectl kube-proxy kubelet runc 
+	lxc exec ${instance} -- mv crictl kubectl kube-proxy kubelet runc /usr/local/bin/
+	lxc exec ${instance} -- mv containerd/bin/* /bin/
+	export CIDR_NUMBER CIDR_IP HOSTNAME
+	envsubst < bridge.conf > 10-bridge.conf
+	lxc file push 10-bridge.conf ${instance}/etc/cni/net.d/10-bridge.conf
+	lxc file push loopback.conf ${instance}/etc/cni/net.d/99-loopback.conf
+	lxc exec ${instance} -- mkdir -p /etc/containerd/
+	lxc file push config.toml ${instance}/etc/containerd/config.toml
+	lxc file push containerd.service ${instance}/etc/systemd/system/containerd.service
+	lxc exec ${instance} -- mv ${HOSTNAME}-key.pem ${HOSTNAME}.pem /var/lib/kubelet/
+	lxc exec ${instance} -- mv ${HOSTNAME}.kubeconfig /var/lib/kubelet/kubeconfig
+	lxc exec ${instance} -- mv ca.pem /var/lib/kubernetes/
+	export CIDR_NUMBER CIDR_IP HOSTNAME
+	envsubst < kubelet-config_template.yaml > kubelet-config.yaml
+	lxc file push kubelet-config.yaml ${instance}/var/lib/kubelet/kubelet-config.yaml
+	lxc file push kubelet.service ${instance}/etc/systemd/system/kubelet.service
+	lxc file push kube-proxy-config.yaml ${instance}/var/lib/kube-proxy/kube-proxy-config.yaml
+	lxc file push kube-proxy.service ${instance}/etc/systemd/system/kube-proxy.service
+	lxc exec ${instance} -- daemon-reload
+	lxc exec ${instance} -- enable containerd kubelet kube-proxy
+	lxc exec ${instance} -- start containerd kubelet kube-proxy
+done
