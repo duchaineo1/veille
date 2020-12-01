@@ -526,7 +526,7 @@ for instance in controller-0 controller-1 controller-2; do
 	lxc exec ${instance} -- mkdir -p /etc/etcd /var/lib/etcd
 	lxc exec ${instance} -- chmod 700 /var/lib/etcd
 	lxc exec ${instance} -- cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
-	export controller0_ip controller1_ip controller2_ip INTERNAL_IP
+	export controller0_ip controller1_ip controller2_ip INTERNAL_IP ETCD_NAME
 	envsubst < etcd.service_template.cfg > etcd.service
 	lxc file push etcd.service ${instance}/etc/systemd/system/etcd.service
 	lxc exec ${instance} -- systemctl daemon-reload
@@ -554,6 +554,6 @@ for instance in controller-0 controller-1 controller-2; do
 	lxc file push kube-controller-manager.service ${instance}/etc/systemd/system/kube-controller-manager.service
 	lxc exec ${instance} -- mv kube-scheduler.kubeconfig /var/lib/kubernetes/
 	lxc file push kube-scheduler.yaml ${instance}/etc/kubernetes/config/kube-scheduler.yaml
-	lxc file push /etc/systemd/system/kube-scheduler.service ${instance}/etc/systemd/system/kube-scheduler.service
+	lxc file push kube-scheduler.service ${instance}/etc/systemd/system/kube-scheduler.service
 	lxc exec ${instance} -- systemctl daemon-reload && systemctl enable kube-apiserver kube-controller-manager kube-scheduler && systemctl start kube-apiserver kube-controller-manager kube-scheduler	
 done
