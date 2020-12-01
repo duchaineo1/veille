@@ -624,3 +624,11 @@ for instance in worker-0 worker-1 worker-2; do
 	lxc exec ${instance} -- systemctl enable containerd kubelet kube-proxy
 	lxc exec ${instance} -- systemctl start containerd kubelet kube-proxy
 done
+
+lxc pull file controller-0/root/admin.kubeconfig kubeconfig
+bad_ip="127.0.0.1"
+proxy_ip=$(lxc list | grep haproxy | awk '{print $6}')
+sed -i "s/$ip/$proxy_ip/g" config
+rm /home/user/.kube/config
+mv config /home/user/.kube/config
+
