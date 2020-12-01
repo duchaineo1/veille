@@ -533,3 +533,18 @@ for instance in controller-0 controller-1 controller-2; do
 	lxc exec ${instance} -- systemctl enable etcd
   	lxc exec ${instance} -- systemctl start etcd
 done
+
+echo '[STEP 8 - Bootstrapping controller nodes]'
+
+for instance in controller-0 controller-1 controller-2; do 
+	lxc exec ${instance} -- mkdir -p /etc/kubernetes/config
+	lxc exec ${instance} -- wget -q --show-progress --https-only --timestamping \
+	  "https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kube-apiserver" \
+	  "https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kube-controller-manager" \
+	  "https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kube-scheduler" \
+	  "https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kubectl"
+	lxc exec ${instance} -- chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
+  	lxc exec ${instance} -- mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
+	lxc exec ${instance} -- mkdir -p /var/lib/kubernetes/
+	lxc exec ${instance} -- mv ca.pem ca-key.pem kubernetes-key.pem kubernetes.pem service-account-key.pem service-account.pem encryption-config.yaml /var/lib/kubernetes/
+done
