@@ -592,10 +592,15 @@ for instance in worker-0 worker-1 worker-2; do
 	lxc exec ${instance} -- tar -xvf crictl-v1.18.0-linux-amd64.tar.gz
 	lxc exec ${instance} -- tar -xvf containerd-1.3.6-linux-amd64.tar.gz -C containerd
 	lxc exec ${instance} -- tar -xvf cni-plugins-linux-amd64-v0.8.6.tgz -C /opt/cni/bin/
-	lxc exec ${instance} -- mkdir mv runc.amd64 runc
+	lxc exec ${instance} -- mv runc.amd64 runc
 	lxc exec ${instance} -- chmod +x crictl kubectl kube-proxy kubelet runc 
 	lxc exec ${instance} -- mv crictl kubectl kube-proxy kubelet runc /usr/local/bin/
-	lxc exec ${instance} -- mv containerd/bin/* /bin/
+	lxc exec ${instance} -- mv containerd/bin/containerd /bin/
+	lxc exec ${instance} -- mv containerd/bin/containerd-shim /bin/
+	lxc exec ${instance} -- mv containerd/bin/containerd-shim-run-v1 /bin/
+	lxc exec ${instance} -- mv containerd/bin/containerd-shim-run-v2 /bin/
+	lxc exec ${instance} -- mv containerd/bin/containerd-stress /bin/
+	lxc exec ${instance} -- mv containerd/bin/ctr /bin/
 	export CIDR_NUMBER CIDR_IP HOSTNAME
 	envsubst < bridge.conf > 10-bridge.conf
 	lxc file push 10-bridge.conf ${instance}/etc/cni/net.d/10-bridge.conf
