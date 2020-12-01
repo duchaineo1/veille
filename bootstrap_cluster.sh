@@ -558,3 +558,9 @@ for instance in controller-0 controller-1 controller-2; do
 	lxc file push kube-scheduler.service ${instance}/etc/systemd/system/kube-scheduler.service
 	lxc exec ${instance} -- systemctl daemon-reload && systemctl enable kube-apiserver kube-controller-manager kube-scheduler && systemctl start kube-apiserver kube-controller-manager kube-scheduler	
 done
+
+lxc file push rbac-cluster-role.yaml controller-0/root/
+lxc file push rbac-cluster-binding.yaml controller-0/root/
+lxc exec controller-0 -- kubectl apply --kubeconfig admin.kubeconfig -f rbac-cluster-role.yaml
+lxc exec controller-0 -- kubectl apply --kubeconfig admin.kubeconfig -f rbac-cluster-binding.yaml
+
