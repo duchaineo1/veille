@@ -548,6 +548,7 @@ for instance in controller-0 controller-1 controller-2; do
   	lxc exec ${instance} -- mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
 	lxc exec ${instance} -- mkdir -p /var/lib/kubernetes/
 	lxc exec ${instance} -- mv ca.pem ca-key.pem kubernetes-key.pem kubernetes.pem service-account-key.pem service-account.pem encryption-config.yaml /var/lib/kubernetes/
+	lxc exec ${instance} -- mv kube-controller-manager.kubeconfig /var/lib/kubernetes/
 	export controller0_ip controller1_ip controller2_ip INTERNAL_IP
 	envsubst < kube-apiserver.service_template > kube-apiserver.service
 	lxc file push kube-apiserver.service ${instance}/etc/systemd/system/kube-apiserver.service
