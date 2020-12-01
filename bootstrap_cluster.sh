@@ -612,6 +612,7 @@ for instance in worker-0 worker-1 worker-2; do
 	lxc exec ${instance} -- mv ${HOSTNAME}-key.pem ${HOSTNAME}.pem /var/lib/kubelet/
 	lxc exec ${instance} -- mv ${HOSTNAME}.kubeconfig /var/lib/kubelet/kubeconfig
 	lxc exec ${instance} -- mv ca.pem /var/lib/kubernetes/
+	lxc exec ${instance} -- mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
 	export CIDR_NUMBER CIDR_IP HOSTNAME
 	envsubst < kubelet-config_template.yaml > kubelet-config.yaml
 	lxc file push kubelet-config.yaml ${instance}/var/lib/kubelet/kubelet-config.yaml
