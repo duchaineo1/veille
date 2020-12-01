@@ -571,7 +571,8 @@ for instance in worker-0 worker-1 worker-2; do
 	CIDR_IP=200.0.$CIDR_NUMBER.0/24
 	HOSTNAME=$(lxc exec ${instance} -- hostname)
 	lxc exec ${instance} -- apt-get install -y socat conntrack ipset
-	swapoff -a
+	lxc exec ${instance} -- swapoff -a 
+	lxc exec ${instance} -- mount --make-rshared /
 	lxc exec ${instance} -- wget -q --show-progress --https-only --timestamping \
   https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.18.0/crictl-v1.18.0-linux-amd64.tar.gz \
   https://github.com/opencontainers/runc/releases/download/v1.0.0-rc91/runc.amd64 \
