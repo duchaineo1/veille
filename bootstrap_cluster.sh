@@ -9,7 +9,6 @@ apt-get update && apt-get upgrade -y && apt-get install -y lxd lxc-utils curl
 
 echo '[STEP 2 - LXD config]'
 lxd init --auto
-lxc network create mynet ipv6.address=none ipv4.address=10.10.10.1/24 ipv4.nat=true
 lxc profile create k8s
 cat k8s_profile.yaml | lxc profile edit k8s
 
