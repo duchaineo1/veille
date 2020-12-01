@@ -588,6 +588,7 @@ for instance in worker-0 worker-1 worker-2; do
 	  /var/lib/kube-proxy \
 	  /var/lib/kubernetes \
 	  /var/run/kubernetes
+	lxc exec ${instance} -- mknod /dev/kmsg c 1 11
 	lxc exec ${instance} -- mkdir containerd
 	lxc exec ${instance} -- tar -xvf crictl-v1.18.0-linux-amd64.tar.gz
 	lxc exec ${instance} -- tar -xvf containerd-1.3.6-linux-amd64.tar.gz -C containerd
