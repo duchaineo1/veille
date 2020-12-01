@@ -597,8 +597,8 @@ for instance in worker-0 worker-1 worker-2; do
 	lxc exec ${instance} -- mv crictl kubectl kube-proxy kubelet runc /usr/local/bin/
 	lxc exec ${instance} -- mv containerd/bin/containerd /bin/
 	lxc exec ${instance} -- mv containerd/bin/containerd-shim /bin/
-	lxc exec ${instance} -- mv containerd/bin/containerd-shim-run-v1 /bin/
-	lxc exec ${instance} -- mv containerd/bin/containerd-shim-run-v2 /bin/
+	lxc exec ${instance} -- mv containerd/bin/containerd-shim-runc-v1 /bin/
+	lxc exec ${instance} -- mv containerd/bin/containerd-shim-runc-v2 /bin/
 	lxc exec ${instance} -- mv containerd/bin/containerd-stress /bin/
 	lxc exec ${instance} -- mv containerd/bin/ctr /bin/
 	export CIDR_NUMBER CIDR_IP HOSTNAME
