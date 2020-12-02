@@ -4,7 +4,7 @@ CONTROLLER_IPS=()
 WORKER_IPS=()
 CLUSTER_IP=""
 echo '[STEP 1 - Install packages]'
-apt-get update && apt-get upgrade -y && apt-get install -y lxd lxc-utils curl
+apt-get update && apt-get upgrade -y && apt-get install -y lxd curl
 
 
 echo '[STEP 2 - LXD config]'
