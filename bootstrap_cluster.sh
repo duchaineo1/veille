@@ -632,4 +632,3 @@ sed -i "s/127.0.0.1/$proxy_ip/g" kubeconfig
 mkdir $HOME/.kube
 mv kubeconfig $HOME/.kube/config
 chmod -R 777 $HOME/.kube/
-
