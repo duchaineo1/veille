@@ -629,7 +629,7 @@ done
 lxc pull file controller-0/root/admin.kubeconfig kubeconfig
 bad_ip="127.0.0.1"
 proxy_ip=$(lxc list | grep haproxy | awk '{print $6}')
-sed -i "s/$ip/$proxy_ip/g" config
-rm /home/user/.kube/config
-mv config /home/user/.kube/config
+sed -i "s/$ip/$proxy_ip/g" kubeconfig
+mkdir $HOME/.kube
+mv kubeconfig $HOME/.kube/config
 
